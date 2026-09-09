@@ -52,7 +52,7 @@ Run.prototype.skillBlock=function(id,nearest){const p=this.p;if(this.item==='scr
  if(!nearest&&!['dew','angler','peril'].includes(id))return '等待目标';
  if(['angler','peril'].includes(id)&&!this.nearest(p,430))return '目标不在范围';
  if(id==='zhiming'&&!this.nearest(p,280))return '等待灰焰近敌';
- if(id==='dali'&&!this.nearest(p,120+this.lv(id)*15))return '等待心火近敌';
+ if(id==='dali'&&!this.nearest(p,70+this.lv(id)*15))return '等待心火近敌';
  if(id==='fragrance'&&!this.nearest(p,430))return '目标不在范围';
  if(id==='spring'&&this.cool.springPower>0&&this.springCharges>0)return '泉势尚有余击';
  if(id==='conceal'&&!this.nearest(p,230))return '尚无近身威胁';

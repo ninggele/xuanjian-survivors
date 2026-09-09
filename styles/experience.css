@@ -96,3 +96,21 @@ body.has-field-event #skillFeedback{top:355px}
 
 .dao-tabs{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:700px){.dao-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 #panel.realm-panel[data-realm-dao="lihuo"]{--realm-gold:#b57a42;--realm-pale:#f4d19b}#panel.realm-panel[data-realm-dao="duijin"]{--realm-gold:#879b9d;--realm-pale:#e0e9e3}
+
+/* First-run reading order: playstyle, immediate effect, then detailed numbers. */
+.path-advice{padding:10px 14px;margin:12px 0;background:#e5e9df;border-left:3px solid #476653;line-height:1.5}
+.path-advice p{margin:4px 0;font-size:14px}.path-advice small{color:#596451;font-size:12px}
+.starter-label{display:inline-block;align-self:flex-start;background:#e2e8d9;color:#35533d;font-size:12px;padding:3px 8px;margin:0 0 8px}
+.starter-card{border-color:#59715b}.foundation-card .decision-purpose{font-size:15px;line-height:1.6}
+@media(max-width:600px){.path-advice{padding:9px 11px}.path-advice p{font-size:13px}}
+@media(min-width:1001px){
+ #panel:has(.dao-tabs){padding:22px 28px}
+ #panel:has(.dao-tabs) h2{margin:10px 0;font-size:30px}
+ #panel:has(.dao-tabs) .dao-tabs{margin-top:10px}
+ #panel:has(.dao-tabs) .dao-tabs button{padding:8px 14px}
+ #panel:has(.dao-tabs) .path-advice{margin:10px 0;padding:8px 12px}
+ #panel .opening-path h3{margin:8px 0}
+ #panel .foundation-card{gap:6px;padding:13px}
+ #panel .foundation-card .foundation-future{min-height:70px}
+ #panel .foundation-card .starter-label{position:absolute;right:12px;top:48px;font-size:10px;padding:2px 4px}
+}

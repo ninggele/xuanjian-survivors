@@ -70,7 +70,7 @@ trainingLv(id){return ({vigor:this.vigor,power:this.extraPower,reach:this.precis
 trainingSnapshot(){return Object.fromEntries(TRAINING.filter(d=>this.trainingLv(d.id)>0).map(d=>[d.id,this.trainingLv(d.id)]));}
 get attackSpeed(){return 1+this.trainingLv('haste')*.08;}
 get weaponTraining(){return this.item==='screen'?0:this.trainingLv('weapon');}
-get healthRegen(){return this.trainingLv('recovery')*.15;}
+get healthRegen(){return this.trainingLv('recovery')*.25;}
 get itemDef(){return ITEMS.find(i=>i.id===this.item)||ITEMS[0];}
 get moveFactor(){return (1+this.trainingLv('stride')*.04)*(this.cool.daliStride>0?1.12:1)*(this.gift==='cloud'?1.14:1)*(this.gift==='sparrow'?(this.cool.brave>0?1.20:1.06):1)*(this.cool.cloud>0?1.35:1)*(this.cool.flameMove>0?1.15:1);}
 heal(n){if(this.state!=='running'||this.p.hp<=0)return 0;const actual=Math.min(n,this.maxHP-this.p.hp);this.p.hp+=actual;this.healed+=actual;return actual;}
