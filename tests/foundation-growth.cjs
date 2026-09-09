@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),X=require('../scripts/field-event.js'
 let count=0;
 function run(id,rank=1){const r=new X.Run(12,'bow');r.opening();r.choose(r.choices.indexOf(id));r.skills[id]=rank;r.state='running';r.spawnTimer=999;r.cool[id]=0;r.p.inv=0;r.p.guard=0;return r;}
 function enemy(r){const e=r.spawn(0,false,r.p.x+70,r.p.y);e.born=0;e.hp=e.max=1000;return e;}
-for(const rank of [1,2])for(const id of Object.keys(X.FoundationGrowth)){
+for(const rank of [1,2])for(const id of X.Cultivation.routes.slice(0,2).flatMap(r=>r.ids)){
  const r=run(id,rank),e=enemy(r);r.p.hp=70;
  if(id==='light')r.shoot(r.p.x+30,r.p.y,r.p.x,r.p.y,10,true);
  if(id==='muddle')e.phase='warn';
@@ -24,7 +24,7 @@ for(const rank of [1,2])for(const id of Object.keys(X.FoundationGrowth)){
  assert.equal(r.zones.count,0);assert.equal(r.allies.count,0);assert(r.p.mp>=92);count++;
 }
 // No targets / no injury must not burn mana or show a false trigger.
-for(const id of Object.keys(X.FoundationGrowth)){const r=run(id);r.updateSkills(.05,null);assert.equal(r.p.mp,100);assert.equal(r.telemetry.foundationTriggers?.[id]||0,0);count++;}
+for(const id of X.Cultivation.routes.slice(0,2).flatMap(r=>r.ids)){const r=run(id);r.updateSkills(.05,null);assert.equal(r.p.mp,100);assert.equal(r.telemetry.foundationTriggers?.[id]||0,0);count++;}
 // Cooldowns prevent hit-rate scaling; paused updates and lethal hits cannot heal.
 {const r=run('spring'),e=enemy(r);r.p.hp=50;for(let i=0;i<20;i++)r.hit(e,1);assert.equal(r.p.hp,52);count++;}
 {const r=run('dusk');r.p.hp=1;r.hurt(100);assert.equal(r.p.hp,0);assert(!r.growthWound);count++;}

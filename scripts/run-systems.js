@@ -1,8 +1,8 @@
 /* Run policies: candidate fairness and automatic casting. Effects stay in content.js. */
 (function(root){'use strict';
-const X=typeof module!=='undefined'?require('./engine.js'):root.XJ;
+const X=typeof module!=='undefined'?require('./dao-data.js'):root.XJ;
 const {Run,SKILLS,RECIPES,dist}=X;
-const costs=Object.freeze({zhiming:30,dali:26,fragrance:24,angler:26,peril:28,spring:22,muddle:20,conceal:18,dew:22,gate:26,edict:14,dusk:20,light:26,pure:18,mountain:24,thunder:28,armor:20,flame:18,rain:22,grove:24});
+const costs=Object.freeze({fireNet:26,fireMarch:24,metalCourt:24,metalBlades:28,metalEdge:22,zhiming:30,dali:26,fragrance:24,angler:26,peril:28,spring:22,muddle:20,conceal:18,dew:22,gate:26,edict:14,dusk:20,light:26,pure:18,mountain:24,thunder:28,armor:20,flame:18,rain:22,grove:24});
 const active=Object.keys(costs).filter(id=>SKILLS.some(s=>s.id===id));
 X.Rules=Object.freeze({costs,rarity:Object.freeze({S:.35,A:.7,B:1}),pityMisses:3,finalAt:675,finalHP:4800,finalCarryCap:2400,version:'0.10.2'});
 // Standard challenge has a fixed time-based budget; never scales from player power.
@@ -72,7 +72,7 @@ Run.prototype.skillOrder=function(nearest,manual=false){this.skillWait??={};if(!
 };
 Run.prototype.castManual=function(){if(this.state!=='running'||!this.manualSkill)return false;const id=this.manualSkill,nearest=this.nearest(this.p,500),reason=this.skillBlock(id,nearest);if(reason){this.notice(SKILLS.find(s=>s.id===id).name+' · '+reason);return false;}if(this.p.mp<this.skillCost(id)){this.notice('法力不足 · 还差 '+Math.ceil(this.skillCost(id)-this.p.mp));return false;}const before=this.cool[id]||0;this.updateSkills(0,nearest,true);return (this.cool[id]||0)>before;};
 // The first learned damage source is protected by default; opting into balanced/manual stays explicit.
-const damageStarters=new Set(['gate','light','rain','flame','thunder','zhiming','dali','fragrance']);
+const damageStarters=new Set(['gate','light','rain','flame','thunder','zhiming','dali','fragrance','fireNet','fireMarch','metalCourt','metalBlades','metalEdge']);
 Run.prototype.loopLog=function(){return this.coreLoop??={decisions:[],samples:[],routes:{},manaWait:0,lastManaWaitAt:-Infinity,formedAt:{}};};
 Run.prototype.loopSummary=function(){const d=this.loopLog();return JSON.parse(JSON.stringify(d));};
 Run.prototype.reserveSkill=function(id){return id===this.primarySkill||id==='dew'||(['conceal','armor'].includes(id)&&this.p.hp<this.maxHP*.45)||this.t-(this.skillWait?.[id]??this.t)>=1;};

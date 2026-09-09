@@ -93,3 +93,6 @@ body.has-field-event #skillFeedback{top:355px}
 @media(prefers-reduced-motion:reduce){.realm-art,.realm-content{animation:none!important}}.reduce-effects .realm-art,.reduce-effects .realm-content{animation:none!important}
 .realm-panel .realm-caption,.realm-panel .realm-progress{color:#b9c9bb}
 .pause-selects{align-items:end}
+
+.dao-tabs{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:700px){.dao-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#panel.realm-panel[data-realm-dao="lihuo"]{--realm-gold:#b57a42;--realm-pale:#f4d19b}#panel.realm-panel[data-realm-dao="duijin"]{--realm-gold:#879b9d;--realm-pale:#e0e9e3}

@@ -75,7 +75,7 @@ function zone(c,run,z,line,oval,label,reduced){
 }
 function ally(){return false;}
 // Realm presentation depends only on attained same-dao ranks, never fruit powers.
-function realmStyle(dao){return dao==='lushui'?{col:'#769e8c',edge:WATER,water:true}:{col:'#bba46b',edge:'#dfc990',water:false};}
+function realmStyle(dao){if(dao==='lihuo')return {col:'#b77b43',edge:'#e7b36f',water:false};if(dao==='duijin')return {col:'#8e999c',edge:'#d5ded8',water:false};return dao==='lushui'?{col:'#769e8c',edge:WATER,water:true}:{col:'#bba46b',edge:'#dfc990',water:false};}
 function realmMark(c,line,x,y,style){
  if(style.water){line([[x-3,y-3],[x,y-6],[x+3,y-3],[x,y+3],[x-3,y-3]],style.col,1.1);line([[x-4,y+5],[x,y+6],[x+4,y+5]],style.edge,1);}
  else{line([[x,y-5],[x+4,y],[x,y+5],[x-4,y],[x,y-5]],style.col,1.1);line([[x-2,y],[x+2,y]],style.edge,1);}
@@ -106,7 +106,7 @@ function giftMark(c,run,p,line,oval,reduced){
 function aura(c,run,p,line,oval,label,reduced){
  for(const l of run.dashengLights||[]){c.save();c.globalAlpha*=Math.min(1,l.life)*.8;const a=l.angle||0,x=l.x,y=l.y-16;line([[x-Math.cos(a)*12,y-Math.sin(a)*12],[x+Math.cos(a)*12,y+Math.sin(a)*12]],'#c7b77c',2);arc(c,x,y,9,a-.8,a+.8,'#e1d3a3',2);c.restore();}
  giftMark(c,run,p,line,oval,reduced);
- if(!['mingyang','lushui'].includes(run.dao))return false;
+ if(!['mingyang','lushui','lihuo','duijin'].includes(run.dao))return false;
  const count=typeof run.masteredCount==='function'?Math.max(0,Math.min(5,run.masteredCount())):0,style=realmStyle(run.dao);
  c.save();if(run.cool?.hidden>0)c.globalAlpha*=.48;
  // Only foundation breath shifts slightly; reduced motion fixes both shape and opacity.

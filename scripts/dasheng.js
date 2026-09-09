@@ -1,6 +1,6 @@
 /* 季越人《玄鉴仙族》：苗家人、喜事。阶段炼器与数值为局内压缩。 */
 (function(root){'use strict';
-const X=typeof module!=='undefined'?require('./cultivation.js'):root.XJ;
+const X=typeof module!=='undefined'?require('./dao-expansion.js'):root.XJ;
 const {Run,dist}=X;
 X.ITEMS.push({id:'dasheng',name:'大昇长戟',action:'挥戟 · 明光',cost:24,cd:7,desc:'普攻以长戟横扫前方，200范围、150度、34伤害，间隔0.85秒。G：24法力，240范围重扫62伤害，冷却7秒。明阳成就首道神通后炼成灵胚，G追加效附戟影与揽照白光；渌水保留法器重扫。'});
 Run.prototype.dashengCount=function(){return this.item==='dasheng'&&this.dao==='mingyang'?Math.min(5,this.masteredCount()):0;};

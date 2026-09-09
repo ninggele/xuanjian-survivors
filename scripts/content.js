@@ -9,6 +9,7 @@ if(!manual&&this.lv('body')===3){let count=0,weight=0;this.enemies.forEach(e=>{i
 if(count===0&&p.battleWounds>0){p.escape+=dt;if(p.escape>1){const n=Math.min(p.battleWounds,(2+this.lv('body'))*dt);this.heal(n);p.battleWounds-=n;}}else p.escape=0;}
 const order=this.skillOrder(nearest,manual);let waited=false;
 for(const id of order){if(this.skillBlock(id,nearest))continue;const lv=this.lv(id),cost=this.skillCost(id);if(!this.spend(cost)){if(manual)break;this.skillBudget??=id;if(!waited){const log=this.loopLog();log.manaWait+=Math.max(0,Math.min(.05,dt));log.lastManaWaitAt=this.t;waited=true;}if(this.reserveSkill(id)){this.skillBudget=id;break;}continue;}delete this.skillWait[id];this.skillCasts??={};this.skillCasts[id]=(this.skillCasts[id]||0)+1;p.cast=.4;this.skillSignal?.(id);
+if(this.castDaoPower?.(id,nearest))continue;
 if(id==='zhiming'){this.zones.add({kind:'zhiming',x:p.x,y:p.y,r:280,life:4,age:0,tick:0,lv});this.cool.zhiming=12;this.effect('zhimingAwaken',p.x,p.y,30,.45);}
 if(id==='dali'){this.zones.add({kind:'dali',x:p.x,y:p.y,r:70+lv*15,life:4,age:0,tick:0,lv});this.cool.daliStride=4;this.cool.dali=9;this.effect('daliAwaken',p.x,p.y,32,.45);}
 if(id==='fragrance'){const target=this.cluster(430,110+lv*15)||nearest;this.zones.add({kind:'fragrance',x:target.x,y:target.y,r:110+lv*15,life:3.2,age:0,tick:0,lv});this.cool.fragrance=10;}
