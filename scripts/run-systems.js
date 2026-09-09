@@ -17,12 +17,12 @@ Run.prototype.enemyDamageMultiplier=function(e,ignore=false){if(ignore)return 1;
 Run.prototype.finalRules=function(){return X.Rules;};
 Run.prototype.skillCost=function(id){return costs[id]||0;};
 const baseValid=Run.prototype.valid;
-Run.prototype.valid=function(){const pool=baseValid.call(this).filter(id=>this.item!=='screen'||id!=='gold');for(const id of ['heal','mana','ward'])if(pool.length<3&&!pool.includes(id))pool.push(id);return pool;};
+Run.prototype.valid=function(){const pool=baseValid.call(this).filter(id=>this.item!=='screen'||!['gold','spring'].includes(id));for(const id of ['heal','mana','ward'])if(pool.length<3&&!pool.includes(id))pool.push(id);return pool;};
 Run.prototype.choiceFit=function(id,gift=false){
  if(gift&&id==='firegift')return this.lv('flame')?{tone:'good',text:'已有雉离行 · 吐焰转向更灵活'}:{tone:'caution',text:'尚未学雉离行 · 当前无战斗收益，之后需另行学会'};
- if(!gift&&this.item==='screen'&&id==='spring')return {tone:'caution',text:'持屏无伤害普攻 · 助击停用且不耗法力；仍计入渌水果位，强化只提高助击'};
+ if(!gift&&this.item==='screen'&&id==='spring')return {tone:'caution',text:'持屏无伤害普攻 · 助击无法生效，不进入候选'};
  if(!gift&&this.item==='screen'&&id==='gold')return {tone:'caution',text:'持屏无伤害普攻 · 锐气与破护无法生效'};
- if(!gift&&this.item==='screen'&&id==='edict')return {tone:'caution',text:'持屏不触发普攻追加打击；仍可召回甲兵、计入明阳果位'};
+ if(!gift&&this.item==='screen'&&id==='edict')return {tone:'caution',text:'持屏不触发普攻追加打击；有谒天门时可召回甲兵'};
  return null;
 };
 Run.prototype.canPrimary=function(id){return this.lv(id)>0&&active.includes(id)&&id!==this.manualSkill&&!(this.item==='screen'&&id==='spring');};
@@ -39,16 +39,16 @@ Run.prototype.offer=function(dao=null,previous=[]){
  if(this.choiceKind==='event'&&skillPool.length>=3)pool=skillPool;
  const weight=id=>this.skillOfferWeight(id);
  const draw=items=>{let n=this.random()*items.reduce((sum,id)=>sum+weight(id),0);for(const id of items){n-=weight(id);if(n<0)return id;}return items[items.length-1];};
- const out=[],routes=RECIPES.filter(r=>r.ids.some(id=>this.lv(id))&&this.fruitProgress(r.id).targets.some(id=>pool.includes(id))).sort((a,b)=>(this.offerMisses?.[b.id]||0)-(this.offerMisses?.[a.id]||0)||b.ids.filter(id=>this.lv(id)).length-a.ids.filter(id=>this.lv(id)).length);
- const route=routes.find(r=>(this.offerMisses?.[r.id]||0)>=X.Rules.pityMisses);
- if(route){const missing=this.fruitProgress(route.id).targets.filter(id=>pool.includes(id)),fresh=missing.filter(id=>!previous.includes(id));out.push(draw(fresh.length?fresh:missing));}
+ // Every growth offer reserves one available learned skill for refinement.
+ const out=[],learned=skillPool.filter(id=>this.lv(id)>0);
+ if(learned.length){const fresh=learned.filter(id=>!previous.includes(id));out.push(draw(fresh.length?fresh:learned));}
  if(cultivation){const fresh=trainingPool.filter(id=>!previous.includes(id));out.push(draw(fresh.length?fresh:trainingPool));}
  while(out.length<3){const needSkills=Math.min(2,skillPool.length),remaining=pool.filter(id=>!out.includes(id)&&(!(cultivation&&out.filter(isSkill).length<needSkills)||isSkill(id)));if(!remaining.length)break;const fresh=remaining.filter(id=>!previous.includes(id));out.push(draw(fresh.length?fresh:remaining));}
  return cultivation?[...out.filter(isSkill),...out.filter(id=>!isSkill(id))]:out;
 };
-Run.prototype.openChoice=function(kind='upgrade',dao=null){this.state='choice';this.choiceKind=kind;this.choiceDao=dao;this.choices=kind==='gift'?X.GIFTS.map(s=>s.id):this.offer(dao);if(['upgrade','event'].includes(kind)){this.offerMisses??={};for(const r of RECIPES){const missing=this.fruitProgress(r.id).targets;if(!r.ids.some(id=>this.lv(id))||!missing.length)this.offerMisses[r.id]=0;else this.offerMisses[r.id]=this.choices.some(id=>missing.includes(id))?0:(this.offerMisses[r.id]||0)+1;}}};
+Run.prototype.openChoice=function(kind='upgrade',dao=null){this.state='choice';this.choiceKind=kind;this.choiceDao=dao;this.choices=kind==='gift'?X.GIFTS.filter(s=>s.id!=='firegift'||this.lv('flame')||SKILLS.filter(k=>this.lv(k.id)).length<this.skillLimit).map(s=>s.id):this.offer(dao);if(['upgrade','event'].includes(kind)){this.offerMisses??={};for(const r of RECIPES){const missing=this.fruitProgress(r.id).targets;if(!r.ids.some(id=>this.lv(id))||!missing.length)this.offerMisses[r.id]=0;else this.offerMisses[r.id]=this.choices.some(id=>missing.includes(id))?0:(this.offerMisses[r.id]||0)+1;}}};
 Run.prototype.reroll=function(){if(this.state!=='choice'||['gift','opening'].includes(this.choiceKind)||this.rerolls<=0)return false;this.choices=this.offer(this.choiceDao,this.choices);this.rerolls--;return true;};
-Run.prototype.skillBlock=function(id,nearest){const p=this.p;if(this.item==='screen'&&id==='spring')return '持屏助击停用 · 仅计果位';if(!this.lv(id))return '尚未修习';if(this.cool[id]>0)return '冷却 '+this.cool[id].toFixed(1)+'s';
+Run.prototype.skillBlock=function(id,nearest){const p=this.p;if(this.item==='screen'&&id==='spring')return '持屏无普攻 · 助击停用';if(!this.lv(id))return '尚未修习';if(this.cool[id]>0)return '冷却 '+this.cool[id].toFixed(1)+'s';
  if(!nearest&&!['dew','angler','peril'].includes(id))return '等待目标';
  if(['angler','peril'].includes(id)&&!this.nearest(p,430))return '目标不在范围';
  if(id==='zhiming'&&!this.nearest(p,280))return '等待灰焰近敌';
@@ -57,7 +57,7 @@ Run.prototype.skillBlock=function(id,nearest){const p=this.p;if(this.item==='scr
  if(id==='spring'&&this.cool.springPower>0&&this.springCharges>0)return '泉势尚有余击';
  if(id==='conceal'&&!this.nearest(p,230))return '尚无近身威胁';
  if(id==='dew'&&!(p.slow>0)&&!this.zones.list().some(z=>z.kind==='hazard'&&dist(z,p)<z.r+60))return '暂无地面威胁';
- if(id==='gate'&&this.allies.count>=Math.min(8,this.lv(id)+1+(this.fruit?2:0)))return '甲兵已足';
+ if(id==='gate'&&this.allies.count>=Math.min(8,this.lv(id)+1+(this.lv(id)===3?2:0)))return '甲兵已足';
  if(id==='thunder'&&!this.nearest(p,175))return '等待近敌';
  if(id==='light'&&!this.nearest(p,195+this.lv(id)*25)&&!this.allies.count)return '等待敌情';
  if(id==='flame'&&!this.nearest(p,155+this.lv(id)*20))return '目标不在焰幅';

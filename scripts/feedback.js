@@ -6,7 +6,7 @@ const verbs={zhiming:'至命并火 · 灰焰重击、短暂断法',dali:'南明�
 Run.prototype.skillSignal=function(id,detail){if(!this.skillSignals)this.skillSignals=[];this.skillSignals.push({id,text:detail||verbs[id]||'',at:this.t});if(this.skillSignals.length>3)this.skillSignals.shift();};
 function dusk(run){return run.zones.list().find(z=>z.kind==='dusk'&&dist(z,run.p)<z.r);}
 function blinkState(run){return !dusk(run)?'须在血漠内':run.cool.blink>0?'冷却 '+run.cool.blink.toFixed(1)+'s':run.p.mp<8?'法力不足':'可挪移 · 8 法力';}
-function state(run,id){if(run.item==='screen'&&id==='spring')return '持屏停用 · 仅计果位';if(run.item==='screen'&&id==='gold')return '持屏无普攻 · 不生效';const p=run.p,z=run.zones.list().find(z=>z.kind===id),c=run.cool;
+function state(run,id){if(id==='gate'&&run.lv(id)>0&&run.lv(id)<3)return run.cool.gate>0?'仙基镇压 · 冷却 '+run.cool.gate.toFixed(1)+'s':'仙基落门 · 自动镇压';if(run.lv(id)>0&&run.lv(id)<3)return '仙基'+(run.lv(id)===1?'一':'二')+'重 · 蕴养中';if(run.item==='screen'&&id==='spring')return '持屏无普攻 · 助击停用';if(run.item==='screen'&&id==='gold')return '持屏无普攻 · 不生效';const p=run.p,z=run.zones.list().find(z=>z.kind===id),c=run.cool;
 if(id==='dusk'){const own=dusk(run);return own?'域内 · 记伤 '+(own.playerWound||0).toFixed(1):z?'域外 · 血漠 '+Math.max(0,z.life-z.age).toFixed(1)+'s':c.dusk>0?'冷却 '+c.dusk.toFixed(1)+'s':'待施放';}
 if(id==='angler'){const n=run.enemies.list().filter(e=>e.lured>0).length;if(n)return '诱引 '+n+' 名 · 受击可清醒';}
 if(id==='zhiming'&&z)return '并火 '+Math.max(0,z.life-z.age).toFixed(1)+'s · 灰焰断法';
@@ -20,6 +20,7 @@ if(id==='armor'&&p.armor>0)return '甲量 '+Math.ceil(p.armor)+' · '+p.armorTim
 if(id==='conceal'&&c.hidden>0)return '藏匿 '+c.hidden.toFixed(1)+'s';
 if(id==='dew'&&c.dewWard>0)return '地面护行 '+c.dewWard.toFixed(1)+'s';
 if(id==='muddle'){const n=run.enemies.list().filter(e=>e.confused>0).length;if(n)return '惑敌 '+n+' 名';}
+if(id==='light'&&run.hasFruitActive())return 'F · 六合敕令 '+Math.floor(run.fruitActiveEnergy())+'%';
 if(id==='light'){const n=run.enemies.list().filter(e=>e.lightUntil>run.t&&e.stun>0).length;if(n)return '禁闭 '+n+' 名';}
 if(z)return '生效 '+Math.max(0,z.life-z.age).toFixed(1)+'s';
 if(c[id]>0)return '冷却 '+c[id].toFixed(1)+'s';const block=run.skillBlock(id,run.nearest(p,500));if(block)return block;const cost=run.skillCost(id);if(cost&&p.mp<cost)return (run.skillBudget===id?'蓄法 · ':'缺法力 · ')+Math.ceil(cost-p.mp);if(run.manualSkill===id)return 'F · 手动待命';return run.skillBlock(id,run.nearest(p,500))||'就绪';}

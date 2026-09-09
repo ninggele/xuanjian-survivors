@@ -1,16 +1,19 @@
-/* One charged fruit slot. Input/energy are adaptations, effects retain 六合 rules. */
+/* Optional charged 天下明 refinement. Legacy method names retained for renderer compatibility. Input/energy are adaptations, effects retain 六合 rules. */
 (function(root){'use strict';const X=typeof module!=='undefined'?require('./content.js'):root.XJ;const {Run,dist}=X;
 X.FruitActive=Object.freeze({cap:100,perSecond:2.5,kill:.15,elite:4,boss:8,killCap:12,combatRange:650});
-Run.prototype.hasFruitActive=function(){return !!this.fruits?.mingyang;};
+Run.prototype.hasFruitActive=function(){return this.lv('light')===3&&this.manualSkill==='light';};
 Run.prototype.fruitActiveEnergy=function(){return Math.max(0,Math.min(100,this.fruitEnergy||0));};
 Run.prototype.addFruitEnergy=function(n){if(!this.hasFruitActive()||this.state!=='running'||this.p.hp<=0)return;const before=this.fruitActiveEnergy();this.fruitEnergy=Math.min(100,before+Math.max(0,n));if(before<100&&this.fruitEnergy>=100)this.notice('六合敕令已蓄满 · 按 F 或点击释放');};
 Run.prototype.castFruitActive=function(){if(this.state!=='running'||this.p.hp<=0||!this.hasFruitActive())return false;if(this.fruitActiveEnergy()<100){this.notice('六合敕令 · 蓄能 '+Math.floor(this.fruitActiveEnergy())+'%');return false;}if(this.lightEdict)return false;
  this.fruitEnergy=0;this.fruitKillEnergy=0;const lv=this.lv('light'),r=(195+lv*25)*1.2;
- this.lightEdict={x:this.p.x,y:this.p.y,r,lv,age:0,next:1};this.telemetry.fruitActives=(this.telemetry.fruitActives||0)+1;this.lightPulse(this.p.x,this.p.y,r,lv,true);this.p.cast=.4;this.notice('六合敕令 · 三敕禁闭');return true;};
+ this.lightEdict={x:this.p.x,y:this.p.y,r,lv,age:0,next:1};this.telemetry.edictActives=(this.telemetry.edictActives||0)+1;this.skillCasts??={};this.skillCasts.light=(this.skillCasts.light||0)+1;this.lightPulse(this.p.x,this.p.y,r,lv,true);this.p.cast=.4;this.notice('六合敕令 · 三敕禁闭');return true;};
+Run.prototype.prepareEdict=function(){if(this.lv('light')===3&&!this.edictPrepared){this.edictPrepared=true;this.fruitEnergy=100;this.fruitKillEnergy=0;}};
 const choose=Run.prototype.choose;
-Run.prototype.choose=function(i){const before=this.hasFruitActive(),ok=choose.call(this,i);if(ok&&!before&&this.hasFruitActive()){this.fruitEnergy=100;this.fruitKillEnergy=0;this.manualSkill=null;this.notice('明阳果位 · 六合敕令就绪，按 F 释放；原手动神通恢复自动');}return ok;};
+Run.prototype.choose=function(i){const before=this.lv('light'),ok=choose.call(this,i);if(ok&&before<3&&this.lv('light')===3){this.prepareEdict();this.notice('天下明三重 · 可在暂停中选择 F 蓄能敕令；当前施放设置保留');}return ok;};
 const manual=Run.prototype.setManual;
-Run.prototype.setManual=function(id){if(this.hasFruitActive()&&id!==null)return false;return manual.call(this,id);};
+Run.prototype.setManual=function(id){const changed=manual.call(this,id);if(changed)this.prepareEdict();return changed;};
+const cast=Run.prototype.castManual;
+Run.prototype.castManual=function(){return this.hasFruitActive()?this.castFruitActive():cast.call(this);};
 const zones=Run.prototype.updateZones;
 Run.prototype.updateZones=function(dt){if(this.state==='running'&&this.hasFruitActive()&&this.p.hp>0){const fighting=this.enemies.list().some(e=>e.born<=0&&dist(e,this.p)<650)||this.bullets.list().some(b=>b.enemy&&dist(b,this.p)<650);if(fighting)this.addFruitEnergy(Math.max(0,Math.min(.05,dt))*2.5);}zones.call(this,dt);};
 const hit=Run.prototype.hit;

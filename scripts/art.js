@@ -38,7 +38,7 @@ if(pose.armor){
 
 if(kind===2){line([[-7,-29],[-14,-18],[-9,-13]],ink,3);line([[5,-29],[14,-20],[10,-13]],ink,3) }else{
 const q=pose.attack||0,u=1-q,prep=pose.prepare||0,stroke=pose.empowered?'#b29a46':pose.spring?'#6faaa4':'#596268';
-const aim=pose.aim??-.7,ready=Math.max(pose.readiness??1,q>0?1:0),targetAngle=Math.atan2(Math.sin(aim),Math.cos(aim)*dir),rest=kind===3?-.85:kind===4?.5:1.7,a=rest+Math.atan2(Math.sin(targetAngle-rest),Math.cos(targetAngle-rest))*ready;
+const aim=pose.aim??-.7,ready=Math.max(pose.readiness??1,q>0?1:0),targetAngle=Math.atan2(Math.sin(aim),Math.cos(aim)*dir)+(kind===7&&q>0?(-.9+1.8*u):0),rest=(kind===3||kind===7)?-.85:kind===4?.5:1.7,a=rest+Math.atan2(Math.sin(targetAngle-rest),Math.cos(targetAngle-rest))*ready;
 // The wrist targets and weapon vertices share exactly the same transform.
 const origin=[Math.cos(a)*11,-29+Math.sin(a)*7+(1-ready)*5];
 function point(x,y,angle=a){return [origin[0]+Math.cos(angle)*x-Math.sin(angle)*y,origin[1]+Math.sin(angle)*x+Math.cos(angle)*y];}
@@ -56,12 +56,13 @@ function arm(shoulder,hand,bend,col=ink){
  const cuff=[hand[0]-ux/len*4,hand[1]-uy/len*4];line([[cuff[0]-uy/len*2.4,cuff[1]+ux/len*2.4],[cuff[0]+uy/len*2.4,cuff[1]-ux/len*2.4]],pose.hero?'#f5ecce':'#849287',1.4);
 }
 let front,back;
-if(kind===3){
- const reach=q>0?24*q*q-5*Math.sin(u*Math.PI):-9*prep;
+if(kind===3||kind===7){
+ const reach=kind===7?Math.sin(u*Math.PI)*8:q>0?24*q*q-5*Math.sin(u*Math.PI):-9*prep;
  back=point(-20+reach,0);front=point(-3+reach,0);
  arm([-3,-32],back,1,'#65736b');arm([4,-32],front,-1);
  line([point(-26+reach,0),point(38+reach,0)],stroke,2);
  c.beginPath();[point(42+reach,0),point(29+reach,-3.7),point(31+reach,0),point(29+reach,3.7)].forEach((p,i)=>i?c.lineTo(...p):c.moveTo(...p));c.closePath();c.fillStyle='#9cacb3';c.fill();c.strokeStyle=stroke;c.lineWidth=1;c.stroke();line([point(32+reach,0),point(41+reach,0)],'#f3f2d8',.8);line([point(25+reach,-2),point(25+reach,2)],'#b39e62',2);
+if(kind===7){line([point(25+reach,-1),point(25+reach,-13),point(36+reach,-18),point(32+reach,-7),point(25+reach,-1)],'#b69a58',2);line([point(21+reach,0),point(21+reach,9),point(28+reach,9)],'#b69a58',1.4);}
 }else if(kind===4){
  const draw=q>0?Math.sin(u*24)*q*3:prep*11,flex=q>0?Math.sin(u*20)*q*2:prep*3;
  front=point(16+flex,0);back=point(-draw,0);

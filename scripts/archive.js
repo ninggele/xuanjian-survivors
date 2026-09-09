@@ -13,6 +13,9 @@ function cleanRecord(r){if(!r||typeof r.id!=='string'||r.id.length>80||!items.in
  if(Number.isInteger(r.seed)&&r.seed>=0&&r.seed<=4294967295)out.seed=r.seed;
  if(r.skills&&typeof r.skills==='object'){out.skills={};for(const id of skills)if(Number.isInteger(r.skills[id])&&r.skills[id]>0&&r.skills[id]<=3)out.skills[id]=r.skills[id];}
  if(r.training&&typeof r.training==='object'){out.training={};for(const d of root.XJ.TRAINING)if(Number.isInteger(r.training[d.id])&&r.training[d.id]>0&&r.training[d.id]<=d.max&&!(r.item==='screen'&&['haste','weapon'].includes(d.id)))out.training[d.id]=r.training[d.id];}
+ if(['筑基','紫府','紫府中期','大真人','五法圆满'].includes(r.realm))out.realm=r.realm;
+ if(['mingyang','lushui'].includes(r.dao))out.dao=r.dao;
+ if(Array.isArray(r.realmHistory))out.realmHistory=r.realmHistory.filter(x=>x&&['紫府','紫府中期','大真人','五法圆满'].includes(x.realm)).slice(0,4).map(x=>({realm:x.realm,at:number(x.at),count:Math.min(5,number(x.count))}));
  if(r.skillCasts&&typeof r.skillCasts==='object'){out.skillCasts={};for(const id of skills)out.skillCasts[id]=Math.floor(number(r.skillCasts[id]));}
  const loop=cleanLoop(r.loop);if(loop)out.loop=loop;
  if(r.medicine&&typeof r.medicine==='object'){out.medicine={};for(const k of ['dropped','picked','healed','left'])out.medicine[k]=number(r.medicine[k]);}
@@ -48,6 +51,6 @@ function merge(raw){const other=clean(raw),map=new Map(data.records.map(r=>[r.id
  for(const mode of ['standard','endless'])for(const item of items){const a=data.best[mode][item]||{time:0,kills:0},b=other.best[mode][item]||{time:0,kills:0};data.best[mode][item]={time:Math.max(a.time,b.time),kills:Math.max(a.kills,b.kills)};}write();}
 function exportFile(){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='几笔长生-修行录.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function nextGoal(){const has=id=>data.marks.includes(id);if(!has('firstWin')){if(!has('firstElite'))return '下一目标 · 击败一名精英，获得首次箓气';if(!has('firstMastery'))return '下一目标 · 将一道神通修至三重';if(!has('firstBoss'))return '下一目标 · 击败一位执阵首领';return '下一目标 · 完成破阵挑战（11分15秒开终阵）';}
- if(!has('fruit:mingyang'))return '下一目标 · 修成明阳果位';if(!has('fruit:lushui'))return '下一目标 · 修成渌水果位';for(const item of items)if(!has('win:'+item))return '下一目标 · 用'+root.XJ.ITEMS.find(x=>x.id===item).name+'破阵';const skill=skills.find(id=>!has('master:'+id));if(skill)return '下一目标 · 将'+root.XJ.SKILLS.find(x=>x.id===skill).name+'修至三重';return '诸法已历 · 换一套神通，挑战自己的纪录';}
+ for(const item of items.filter(id=>id!=='screen'))if(!has('win:'+item))return '下一目标 · 用'+root.XJ.ITEMS.find(x=>x.id===item).name+'破阵';const openSkills=root.XJ.Cultivation.routes.flatMap(r=>r.ids),skill=openSkills.find(id=>!has('master:'+id));if(skill)return '下一目标 · 将'+root.XJ.SKILLS.find(x=>x.id===skill).name+'修至三重';return '诸法已历 · 换一套神通，挑战自己的纪录';}
 root.XJArchive={record,merge,exportFile,nextGoal,markIds,get data(){return data;},get message(){return storageMessage;}};
 })(window);
