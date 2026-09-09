@@ -15,6 +15,7 @@ function cleanRecord(r){if(!r||typeof r.id!=='string'||r.id.length>80||!items.in
  if(r.training&&typeof r.training==='object'){out.training={};for(const d of root.XJ.TRAINING)if(Number.isInteger(r.training[d.id])&&r.training[d.id]>0&&r.training[d.id]<=d.max&&!(r.item==='screen'&&['haste','weapon'].includes(d.id)))out.training[d.id]=r.training[d.id];}
  if(r.skillCasts&&typeof r.skillCasts==='object'){out.skillCasts={};for(const id of skills)out.skillCasts[id]=Math.floor(number(r.skillCasts[id]));}
  const loop=cleanLoop(r.loop);if(loop)out.loop=loop;
+ if(r.medicine&&typeof r.medicine==='object'){out.medicine={};for(const k of ['dropped','picked','healed','left'])out.medicine[k]=number(r.medicine[k]);}
  if(gifts.includes(r.gift))out.gift=r.gift;
  if(r.primarySkill===null)out.primarySkill=null;
  else if(skills.includes(r.primarySkill)&&out.skills?.[r.primarySkill]&&root.XJ.Rules.costs[r.primarySkill])out.primarySkill=r.primarySkill;
